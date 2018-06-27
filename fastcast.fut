@@ -9,8 +9,11 @@ type position_maybe = (position, bool)
 
 type direction = vec3.vec
 
+type rgb = {r: f32, g: f32, b: f32}
+
 type sphere = {center: position,
-               radius: f32}
+               radius: f32,
+               color: rgb}
 
 type line = {origin: position,
              direction: direction}
@@ -34,7 +37,7 @@ let merge (z: f32) (i: i32): i64 =
 let unmerge (t: i64): i32 =
   i32.i64 t
 
-let find_hit [n] (ray: line) (spheres: [n]sphere): (position, i32, position) =
+let find_hit [n] (ray: line) (spheres: [n]sphere): (position, i32, sphere) =
 
   let stuff i =
     let (p0, p1) = cast_ray_sphere ray (unsafe spheres[i])
@@ -47,8 +50,8 @@ let find_hit [n] (ray: line) (spheres: [n]sphere): (position, i32, position) =
   let s = unsafe spheres[unmerge res // 2]
   let (p0, p1) = cast_ray_sphere ray s
   let p = unsafe ([p0, p1])[unmerge res & 1]
-  let r = i32.f32 ((p.z + 0.5) / p.z) * 60
-  in (p, r, s.center)
+  let mask = i32.f32 ((p.z + 0.5) / p.z)
+  in (p, mask, s)
 
 let make_rays (width: i32) (height: i32) (screen_view_dist: f32) (eye: eye): [width][height]line =
   let make_ray_from_screen (x: i32) (y: i32): line =
@@ -63,19 +66,26 @@ let make_rays (width: i32) (height: i32) (screen_view_dist: f32) (eye: eye): [wi
     in {origin=origin', direction=direction'}
   in map (\x -> map (\y -> make_ray_from_screen x y) (0..<height)) (0..<width)
 
-let light: position = {x= 200, y=100, z= 50}
+let lights: []position = [{x= 200, y=100, z=50}, {x= -200, y= -100, z= 150}]
 
 let render (width: i32) (height: i32) (screen_view_dist: f32) (eye: eye) (spheres: []sphere): [width][height]argb.colour =
   let rayss = make_rays width height screen_view_dist eye
   let find_colour (ray: line): argb.colour =
-    let (h, k, center) = find_hit ray spheres
-    let normal = vec3.normalise (h vec3.- center)
-    let v = light vec3.- h
-    let dist = vec3.norm v
-    let dir = vec3.scale (1.0 / dist) v
-    let intensity = 100000.0
-    let mag = intensity * vec3.dot normal dir / (dist * dist)
-    in 255 << 24 | i32.max k (i32.min 255 (i32.f32 (mag * 255.0)))
+    let (h, mask, sphere) = find_hit ray spheres
+    let normal = vec3.normalise (h vec3.- sphere.center)
+    let light_mag light =
+      let v = light vec3.- h
+      let dist = vec3.norm v
+      let dir = vec3.scale (1.0 / dist) v
+      let intensity = 100000.0
+      let mag = intensity * vec3.dot normal dir / (dist * dist)
+      in mag
+    let mag = f32.min 1.0 (f32.sum (map light_mag lights))
+
+    let ambient = 0.14
+    let convert t = i32.max 0 (i32.min 255 (i32.f32 ((f32.max (t * ambient * f32.i32 mask) mag) * t * 255.0)))
+      
+    in 255 << 24 | convert sphere.color.r << 16 | convert sphere.color.g << 8 | convert sphere.color.b
   in map (\rays -> map find_colour rays) rayss
 
 let main [n]
@@ -92,9 +102,17 @@ let main [n]
  (sphere_center_ys: [n]f32)
  (sphere_center_zs: [n]f32)
  (sphere_radiuses: [n]f32)
+ (sphere_color_rs: [n]f32)
+ (sphere_color_gs: [n]f32)
+ (sphere_color_bs: [n]f32)
  : [width][height]argb.colour =
   let eye = {position={x=eye_position_x, y=eye_position_y, z=eye_position_z},
              orientation={x=eye_orientation_x, y=eye_orientation_y, z=eye_orientation_z}}
-  let spheres = map4 (\x y z r -> {center={x=x, y=y, z=z}, radius=r})
-                sphere_center_xs sphere_center_ys sphere_center_zs sphere_radiuses
+  let spheres = map (\(x, y, z, radius, r, g, b) -> {center={x=x, y=y, z=z},
+                                                     radius=radius,
+                                                     color={r=r, g=g, b=b}})
+                (zip
+                 sphere_center_xs sphere_center_ys sphere_center_zs
+                 sphere_radiuses
+                 sphere_color_rs sphere_color_gs sphere_color_bs)
   in render width height screen_view_dist eye spheres

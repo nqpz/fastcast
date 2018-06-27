@@ -22,10 +22,17 @@ class Eye:
         self.position = position
         self.orientation = orientation
 
+class RGB:
+    def __init__(self, r, g, b):
+        self.r = r
+        self.g = g
+        self.b = b
+        
 class Sphere:
-    def __init__(self, center, radius):
+    def __init__(self, center, radius, color):
         self.center = center
         self.radius = radius
+        self.color = color
 
 _size = lambda s: tuple(map(int, s.split('x')))
 arg_parser = argparse.ArgumentParser(description='use arrow keys')
@@ -48,10 +55,21 @@ eye = copy.deepcopy(eye_orig)
 screen_view_dist = 800.0
 
 spheres_test0 = [
-    Sphere(center=Vec3(x=100.0, y=100.0, z=240.0), radius=120.0),
-    Sphere(center=Vec3(x=150.0, y=200.0, z=260.0), radius=100.0),
-    Sphere(center=Vec3(x=-150.0, y=-200.0, z=160.0), radius=100.0),
+    Sphere(center=Vec3(x=100.0, y=100.0, z=240.0),
+           radius=120.0,
+           color=RGB(r=0.9, g=0.1, b=0.8)),
+    Sphere(center=Vec3(x=150.0, y=200.0, z=260.0),
+           radius=100.0,
+           color=RGB(r=1.0, g=0.0, b=0.0)),
+    Sphere(center=Vec3(x=-150.0, y=-200.0, z=160.0),
+           radius=100.0,
+           color=RGB(r=0.1, g=0.2, b=0.9)),
 ]
+for i in range(20):
+    spheres_test0.append(
+        Sphere(center=Vec3(x=-600.0 + i * 13.0, y=-400.0 + i * 50.0, z=240.0 - i * 10.0),
+               radius=20.0,
+               color=RGB(r=0.9, g=0.1, b=0.8)))
 
 def show_text(what, where):
     text = font.render(what, 1, (255, 255, 255))
@@ -63,12 +81,17 @@ def render():
     sphere_center_ys = numpy.fromiter(map(lambda s: s.center.y, spheres), dtype='float32')
     sphere_center_zs = numpy.fromiter(map(lambda s: s.center.z, spheres), dtype='float32')
     sphere_radiuses = numpy.fromiter(map(lambda s: s.radius, spheres), dtype='float32')
+    sphere_color_rs = numpy.fromiter(map(lambda s: s.color.r, spheres), dtype='float32')
+    sphere_color_gs = numpy.fromiter(map(lambda s: s.color.g, spheres), dtype='float32')
+    sphere_color_bs = numpy.fromiter(map(lambda s: s.color.b, spheres), dtype='float32')
 
     start = time.time()
     frame = fastcast.main(size[0], size[1], screen_view_dist,
                           eye.position.x, eye.position.y, eye.position.z,
                           eye.orientation.x, eye.orientation.y, eye.orientation.z,
-                          sphere_center_xs, sphere_center_ys, sphere_center_zs, sphere_radiuses).get()
+                          sphere_center_xs, sphere_center_ys, sphere_center_zs,
+                          sphere_radiuses,
+                          sphere_color_rs, sphere_color_gs, sphere_color_bs).get()
     end = time.time()
     pygame.surfarray.blit_array(surface, frame)
     screen.blit(surface, (0, 0))
