@@ -65,7 +65,7 @@ spheres_test0 = [
            radius=100.0,
            color=RGB(r=0.1, g=0.2, b=0.9)),
 ]
-for i in range(20):
+for i in range(50):
     spheres_test0.append(
         Sphere(center=Vec3(x=-600.0 + i * 13.0, y=-400.0 + i * 50.0, z=240.0 - i * 10.0),
                radius=20.0,
@@ -96,14 +96,16 @@ def render():
     pygame.surfarray.blit_array(surface, frame)
     screen.blit(surface, (0, 0))
 
-    show_text('Futhark call: {:.02f} ms'.format((end - start) * 1000),
+    show_text(' Futhark call: {:.02f} ms'.format((end - start) * 1000),
               (10, 10))
-    show_text('    Position: ({:.02f}, {:.02f}, {:.02f})'.format(
+    show_text('     Position: ({:.02f}, {:.02f}, {:.02f})'.format(
         eye.position.x, eye.position.y, eye.position.z),
               (10, 40))
-    show_text(' Orientation: ({:.02f}, {:.02f}, {:.02f})'.format(
+    show_text('  Orientation: ({:.02f}, {:.02f}, {:.02f})'.format(
         eye.orientation.x, eye.orientation.y, eye.orientation.z),
               (10, 70))
+    show_text('Draw distance: {:.02f}'.format(screen_view_dist),
+              (10, 100))
 
     pygame.display.flip()
 
@@ -128,9 +130,9 @@ while True:
                 eye.position.z -= 1
             if event.key == pygame.K_PAGEUP:
                 eye.position.z += 1
-            if event.key == pygame.K_MINUS:
+            if event.key in [pygame.K_MINUS, pygame.K_KP_MINUS]:
                 screen_view_dist -= 1
-            if event.key == pygame.K_PLUS:
+            if event.key in [pygame.K_PLUS, pygame.K_KP_PLUS]:
                 screen_view_dist += 1
             if event.key == pygame.K_HOME:
                 eye = copy.deepcopy(eye_orig)
