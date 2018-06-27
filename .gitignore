@@ -1,2 +1,3 @@
 /fastcast.py
 __pycache__
+*.pyc
