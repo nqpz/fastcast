@@ -76,6 +76,7 @@ pygame.init()
 pygame.display.set_caption('fastcast')
 screen = pygame.display.set_mode(size)
 surface = pygame.Surface(size, depth=32)
+clock = pygame.time.Clock()
 font = pygame.font.SysFont('DejaVu Sans Mono, monospace', 18, bold=True)
 
 eye_orig = Eye(Vec3(x=0.0, y=0.0, z=0.0), Vec3(x=0.0, y=0.0, z=0.0))
@@ -129,7 +130,7 @@ def render():
     # ori_x = math.cos(eye.orientation.x)
     # ori_y = 0
     # ori_z = math.sin(eye.orientation.x)
-    
+
     start = time.time()
     frame = fastcast.main(size[0], size[1], screen_view_dist,
                           eye.position.x, eye.position.y, eye.position.z,
@@ -148,9 +149,10 @@ def render():
     texts.append('(Press h to hide/show stats)')
     if show_stats:
         texts.extend([
-            ' Futhark call: {:.02f} ms'.format((end - start) * 1000),
+            ' Futhark call: {:.02f} ms; FPS: {:.02f}'.format(
+                (end - start) * 1000, clock.get_fps()),
 
-            '      Spheres: {}'.format(len(spheres_test0)),
+            '      Spheres: {}; lights: {}'.format(len(spheres), len(lights)),
 
             '     Position: ({:.02f}, {:.02f}, {:.02f})'.format(
                 eye.position.x, eye.position.y, eye.position.z),
@@ -158,7 +160,7 @@ def render():
             '  Orientation: ({:.02f}, {:.02f}, {:.02f})'.format(
                 eye.orientation.x, eye.orientation.y, eye.orientation.z),
 
-            '  Screen view: {:.02f}'.format(screen_view_dist),
+            '  View dist.: {:.02f}'.format(screen_view_dist),
         ])
     for text, i in zip(texts, range(len(texts))):
         show_text(text, (10, 10 + i * 20))
@@ -167,6 +169,8 @@ def render():
 
 keydown = {}
 while True:
+    clock.tick()
+
     spheres_test0[2].center.x += 0.3
     lights_test0[0].position.x -= 0.3
     lights_test0[0].position.y -= 0.2
