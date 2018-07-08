@@ -63,6 +63,7 @@ def rotate_point(angle, origo, point):
     (xp, yp, zp) = (origo.x + x3, origo.y + y3, origo.z + z3)
     return Vec3(xp, yp, zp)
 
+
 _size = lambda s: tuple(map(int, s.split('x')))
 arg_parser = argparse.ArgumentParser(description='use arrow keys')
 arg_parser.add_argument('--size', type=_size, metavar='WIDTHxHEIGHT',
@@ -127,15 +128,10 @@ def render():
     light_position_zs = numpy.fromiter(map(lambda l: l.position.z, lights), dtype='float32')
     light_intensities = numpy.fromiter(map(lambda l: l.intensity, lights), dtype='float32')
 
-    # ori_x = math.cos(eye.orientation.x)
-    # ori_y = 0
-    # ori_z = math.sin(eye.orientation.x)
-
     start = time.time()
     frame = fastcast.main(size[0], size[1], screen_view_dist,
                           eye.position.x, eye.position.y, eye.position.z,
                           eye.orientation.x, eye.orientation.y, eye.orientation.z,
-                          # ori_x, ori_y, ori_z,
                           sphere_center_xs, sphere_center_ys, sphere_center_zs,
                           sphere_radiuses,
                           sphere_color_rs, sphere_color_gs, sphere_color_bs,
