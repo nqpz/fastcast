@@ -121,7 +121,7 @@ let render
       in mag
     let mag = f32.min 1.0 (f32.sum (map light_mag lights))
 
-    let ambient = 0.14
+    let ambient = 0.24
     let convert t = i32.max 0 (i32.min 255 (i32.f32 ((f32.max (t * ambient * f32.i32 mask) mag) * t * 255.0)))
 
     in 255 << 24 | convert sphere.color.r << 16 | convert sphere.color.g << 8 | convert sphere.color.b
