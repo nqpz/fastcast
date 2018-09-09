@@ -1,12 +1,12 @@
-import "/futlib/vector"
+import "lib/github.com/athas/vector/vspace"
 
-module vec3 = mk_vec3 f32
+module vec3 = mk_vspace_3d f32
 
-type position = vec3.vec
+type position = vec3.vector
 type position_maybe = (position, bool)
 
-type direction = vec3.vec
-type angle = vec3.vec
+type direction = vec3.vector
+type angle = vec3.vector
 
 type rgb = {r: f32, g: f32, b: f32}
 type argb = i32
@@ -27,7 +27,7 @@ type eye = {position: position,
 
 -- Rotate a point around an origo.  We only really use a small part of this, but
 -- here it is.
-let rotate_point (angle: vec3.vec) (origo: vec3.vec) (point: vec3.vec): vec3.vec =
+let rotate_point (angle: angle) (origo: position) (point: position): position =
   let (x0, y0, z0) = (point.x - origo.x, point.y - origo.y, point.z - origo.z)
 
   let (sin_x, cos_x) = (f32.sin angle.x, f32.cos angle.x)
@@ -171,6 +171,12 @@ let render
        | convert sphere.color.g light_color.g << 8
        | convert sphere.color.b light_color.b
   in map find_color rays
+
+let zip6 [n] 'a 'b 'c 'd 'e 'f (as: [n]a) (bs: [n]b) (cs: [n]c) (ds: [n]d) (es: [n]e) (fs: [n]f): [n](a,b,c,d,e,f) =
+  map (\(a,(b,c,d,e,f)) -> (a,b,c,d,e,f)) (zip as (zip5 bs cs ds es fs))
+
+let zip7 [n] 'a 'b 'c 'd 'e 'f 'g (as: [n]a) (bs: [n]b) (cs: [n]c) (ds: [n]d) (es: [n]e) (fs: [n]f) (gs: [n]g): [n](a,b,c,d,e,f,g) =
+  map (\(a,(b,c,d,e,f,g)) -> (a,b,c,d,e,f,g)) (zip as (zip6 bs cs ds es fs gs))
 
 let main [m] [n]
  (width: i32)
