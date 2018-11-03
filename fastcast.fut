@@ -72,7 +72,7 @@ let encode_dist_and_index (dist: f32) (dot: f32) (i: i32): i64 =
   let k1 = i32.f32 (f32.abs dist + 1.5)
   let k1 = k1 // k1
   let k = k0 * k1 in
-  (i64.i32 (k * i32.f32 dist + (1 - k) * i32.largest) << 32) | i64.i32 (k * i)
+  (i64.i32 (k * i32.f32 dist + (1 - k) * i32.highest) << 32) | i64.i32 (k * i)
 
 -- Extract the index, which is stored on the 32 least significant bits.
 let decode_index (code: i64): i32 =
@@ -127,7 +127,7 @@ let find_intersection_hit [n_spheres]
     in i64.min (encode_dist_and_index dist0 dot0 i0)
                (encode_dist_and_index dist1 dot1 i1)
 
-  let ne = i64.i32 i32.largest << 32
+  let ne = i64.i32 i32.highest << 32
   let res = reduce_comm (\s0 s1 -> i64.min s0 s1) ne
                         (map2 prep (0..<n_spheres) spheres)
 
