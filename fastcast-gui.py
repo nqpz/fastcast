@@ -69,6 +69,8 @@ _size = lambda s: tuple(map(int, s.split('x')))
 arg_parser = argparse.ArgumentParser(description='Instructions in README.md')
 arg_parser.add_argument('--size', type=_size, metavar='WIDTHxHEIGHT',
                         help='set the size of the window')
+arg_parser.add_argument('--demo', action='store_true',
+                        help='show a non-interactive demo')
 args = arg_parser.parse_args()
 size = args.size or (800, 600)
 
@@ -186,13 +188,27 @@ def render():
 
     pygame.display.flip()
 
+if args.demo:
+    forward, right, backward, left, up, down = \
+        pygame.K_UP, pygame.K_RIGHT, pygame.K_DOWN, pygame.K_LEFT, \
+        pygame.K_PAGEUP, pygame.K_PAGEDOWN
+
+    demo_events = [
+        (forward, 100),
+        (right, 80),
+        (backward, 100),
+        (up, 50),
+        (left, 40),
+        (down, 50),
+    ]
+
+    cur_demo_event = 0
+    cur_demo_tick = 1
+    show_stats = False
+
 keydown = {}
 while True:
     clock.tick()
-
-    # spheres_test0[3].center.x += 0.3
-    # lights_test0[0].position.x -= 0.3
-    # lights_test0[0].position.y -= 0.2
 
     sphere_center_xs[3] += 0.3
     light_position_xs[0] -= 0.3
@@ -216,6 +232,17 @@ while True:
                 del keydown[event.key]
             except KeyError:
                 pass
+
+    if args.demo:
+        if cur_demo_tick == 1:
+            keydown[demo_events[cur_demo_event][0]] = True
+            cur_demo_tick += 1
+        elif cur_demo_tick == demo_events[cur_demo_event][1]:
+            del keydown[demo_events[cur_demo_event][0]]
+            cur_demo_event = (cur_demo_event + 1) % len(demo_events)
+            cur_demo_tick = 1
+        else:
+            cur_demo_tick += 1
 
     move_factor = 4 if keydown.get(pygame.K_LSHIFT) or keydown.get(pygame.K_RSHIFT) else 1
     if keydown.get(pygame.K_DOWN):
