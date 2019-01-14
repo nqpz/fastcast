@@ -5,7 +5,8 @@
 The screenshot is from a run on an NVIDIA GTX 960M.
 
 This program raycasts spheres without reflections.  It uses a naive
-lighting model where light is never blocked by other spheres.
+(i.e, *wrong*) lighting model where light is never blocked by other
+spheres.
 
 fastcast tries to keep it simple, and is compiled into a single map
 kernel over the screen dimensions.  There is also some bit fiddling just
