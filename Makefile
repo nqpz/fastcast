@@ -6,10 +6,10 @@ run: fastcast.py
 	python3 fastcast-gui.py
 
 fastcast.py: lib *.fut
-	futhark-pyopencl --library fastcast.fut
+	futhark pyopencl --library fastcast.fut
 
 lib:
-	futhark-pkg sync
+	futhark pkg sync
 
 clean:
 	rm -f fastcast.py
