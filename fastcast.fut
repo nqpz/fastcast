@@ -93,14 +93,14 @@ let make_ray (screen_view_dist: f32) (eye: eye) (origin: position): line =
   let origin'' = origin' vec3.+ eye.position
   in {origin=origin'', direction=direction''}
 
-let make_rays (width: i32) (height: i32) (screen_view_dist: f32) (eye: eye): []line =
+let make_rays (width: i32) (height: i32) (screen_view_dist: f32) (eye: eye): [][]line =
   let make_ray_from_screen ((x, y): (i32, i32)): line =
     let origin = {x=r32 x - r32 width / 2.0,
                   y=r32 y - r32 height / 2.0,
                   z=0}
     in make_ray screen_view_dist eye origin
- in map make_ray_from_screen
-    (flatten (map (\x -> map (\y -> (x, y)) (0..<height)) (0..<width)))
+  in map (map make_ray_from_screen)
+         (tabulate_2d height width (\y x -> (x, y)))
 
 -- Find the closest intersection between the ray and a sphere, and return both
 -- the hit position and the sphere.  If there is no hit, the position will be
@@ -145,7 +145,7 @@ let render
  (width: i32) (height: i32)
  (screen_view_dist: f32) (eye: eye)
  (spheres: []sphere) (lights: []light)
- : []argb =
+ : [][]argb =
   let rays = make_rays width height screen_view_dist eye
   let find_color (ray: line): argb =
     let (hit, sphere) = find_intersection_hit screen_view_dist eye ray spheres
@@ -170,58 +170,10 @@ let render
        | convert sphere.color.r light_color.r << 16
        | convert sphere.color.g light_color.g << 8
        | convert sphere.color.b light_color.b
-  in map find_color rays
+  in map (map find_color) rays
 
 let zip6 [n] 'a 'b 'c 'd 'e 'f (as: [n]a) (bs: [n]b) (cs: [n]c) (ds: [n]d) (es: [n]e) (fs: [n]f): [n](a,b,c,d,e,f) =
   map (\(a,(b,c,d,e,f)) -> (a,b,c,d,e,f)) (zip as (zip5 bs cs ds es fs))
 
 let zip7 [n] 'a 'b 'c 'd 'e 'f 'g (as: [n]a) (bs: [n]b) (cs: [n]c) (ds: [n]d) (es: [n]e) (fs: [n]f) (gs: [n]g): [n](a,b,c,d,e,f,g) =
   map (\(a,(b,c,d,e,f,g)) -> (a,b,c,d,e,f,g)) (zip as (zip6 bs cs ds es fs gs))
-
-let main [m] [n]
- (width: i32)
- (height: i32)
- (screen_view_dist: f32)
- (eye_position_x: f32)
- (eye_position_y: f32)
- (eye_position_z: f32)
- (eye_orientation_x: f32)
- (eye_orientation_y: f32)
- (eye_orientation_z: f32)
- (sphere_center_xs: [n]f32)
- (sphere_center_ys: [n]f32)
- (sphere_center_zs: [n]f32)
- (sphere_radiuses: [n]f32)
- (sphere_color_rs: [n]f32)
- (sphere_color_gs: [n]f32)
- (sphere_color_bs: [n]f32)
- (light_position_xs: [m]f32)
- (light_position_ys: [m]f32)
- (light_position_zs: [m]f32)
- (light_intensities: [m]f32)
- (light_color_rs: [m]f32)
- (light_color_gs: [m]f32)
- (light_color_bs: [m]f32)
- : []argb =
-  let eye = {position={x=eye_position_x, y=eye_position_y, z=eye_position_z},
-             orientation={x=eye_orientation_x, y=eye_orientation_y, z=eye_orientation_z}}
-
-  let spheres: [n]sphere = map (\(x, y, z, radius, r, g, b) ->
-                                {center={x=x, y=y, z=z},
-                                 radius=radius,
-                                 color={r=r, g=g, b=b}})
-    (zip7
-     sphere_center_xs sphere_center_ys sphere_center_zs
-     sphere_radiuses
-     sphere_color_rs sphere_color_gs sphere_color_bs)
-
-  let lights: [m]light = map (\(x, y, z, i, r, g, b) ->
-                              {position={x=x, y=y, z=z},
-                               intensity=i,
-                               color={r=r, g=g, b=b}})
-    (zip7
-     light_position_xs light_position_ys light_position_zs
-     light_intensities
-     light_color_rs light_color_gs light_color_bs)
-
-  in render width height screen_view_dist eye spheres lights

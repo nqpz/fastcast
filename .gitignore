@@ -1,4 +1,7 @@
-/fastcast.py
 __pycache__
 *.pyc
+*.o
 /lib
+/lys
+/lys_wrapper.c
+/lys_wrapper.h

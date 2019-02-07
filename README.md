@@ -12,7 +12,7 @@ fastcast tries to keep it simple, and is compiled into a single map
 kernel over the screen dimensions.  There is also some bit fiddling just
 for the fun of it.
 
-Run `make run` to run the default demo.
+Run `futhark pkg sync && make run` to run the default demo.
 
 
 ## Controls
@@ -27,7 +27,5 @@ Run `make run` to run the default demo.
 
 ## Requirements
 
-  + Python 3 or Python 2.7
   + Futhark
-  + PyOpenCL
-  + NumPy
+  + SDL2 and SDL2-ttf with headers.
