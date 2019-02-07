@@ -28,7 +28,7 @@ module lys: lys = {
   type state = {h: i32, w: i32,
                 screen_view_dest: f32, eye: fastcast.eye,
                 spheres: []fastcast.sphere, lights: []fastcast.light,
-                keys: keys_state}
+                keys: keys_state, show_stats: bool}
 
   let init (h: i32) (w: i32): state =
     {w, h,
@@ -37,7 +37,8 @@ module lys: lys = {
      spheres=copy test_spheres,
      lights=copy test_lights,
      keys={shift=false, down=false, up=false, left=false, right=false,
-           pagedown=false, pageup=false, minus=false, plus=false}}
+           pagedown=false, pageup=false, minus=false, plus=false},
+     show_stats=true}
 
   let resize (h: i32) (w: i32) (s: state) =
     s with h = h with w = w
@@ -69,7 +70,9 @@ module lys: lys = {
     let pressed = match e
                   case #keydown -> true
                   case #keyup -> false
-    in s with keys = keychange k pressed s.keys
+    in if k == SDLK_h && pressed
+       then s with show_stats = !s.show_stats
+       else s with keys = keychange k pressed s.keys
 
   let step_eye (move_factor: f32) (keys: keys_state) (eye0: fastcast.eye) =
     let move_eye op (eye : fastcast.eye) =
@@ -111,6 +114,42 @@ module lys: lys = {
 
   let render (s: state) =
     fastcast.render s.w s.h s.screen_view_dest s.eye s.spheres s.lights
+
+  let text (render_duration: f32) (s: state): []printf_input =
+    let top = (spad "(Press h to hide/show stats)",
+               [ printf_placeholder
+               , printf_placeholder
+               , printf_placeholder
+               ], argb.white)
+    in if !s.show_stats
+       then [top]
+       else [ top
+            , (spad "Futhark render: %s ms",
+               [ (#f32, printf_val with f32 = render_duration)
+               , printf_placeholder
+               , printf_placeholder
+               ], argb.white)
+            , (spad "Spheres: %s; lights: %s",
+               [ (#i32, printf_val with i32 = length s.spheres)
+               , (#i32, printf_val with i32 = length s.lights)
+               , printf_placeholder
+               ], argb.white)
+            , (spad "Position: (%s, %s, %s)",
+               [ (#f32, printf_val with f32 = s.eye.position.x)
+               , (#f32, printf_val with f32 = s.eye.position.y)
+               , (#f32, printf_val with f32 = s.eye.position.z)
+               ], argb.white)
+            , (spad "Orientation: (%s, %s, %s)",
+               [ (#f32, printf_val with f32 = s.eye.orientation.x)
+               , (#f32, printf_val with f32 = s.eye.orientation.y)
+               , (#f32, printf_val with f32 = s.eye.orientation.z)
+               ], argb.white)
+            , (spad "View dist.: %s",
+               [ (#f32, printf_val with f32 = s.screen_view_dest)
+               , printf_placeholder
+               , printf_placeholder
+               ], argb.white)
+            ]
 
   let mouse _ _ _ s = s
   let wheel _ _ s = s
