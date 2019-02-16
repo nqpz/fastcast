@@ -110,7 +110,16 @@ module lys: lys = {
                             else if s.keys.plus
                             then s.screen_view_dest - 5 * move_factor
                             else s.screen_view_dest
-    in s with eye = eye' with screen_view_dest = screen_view_dest'
+   -- XXX: We should be able to get rid of these copies.
+   let spheres' = copy s.spheres
+   let lights' = copy s.lights
+   let spheres'[3] = spheres'[3] with center.x = spheres'[3].center.x + 0.3
+   let lights'[0] = lights'[0] with position.x = lights'[0].position.x - 0.3
+                               with position.y = lights'[0].position.y - 0.2
+   in s with eye = eye'
+        with screen_view_dest = screen_view_dest'
+        with spheres = spheres'
+        with lights = lights'
 
   let render (s: state) =
     fastcast.render s.w s.h s.screen_view_dest s.eye s.spheres s.lights
