@@ -115,41 +115,17 @@ module lys: lys = {
   let render (s: state) =
     fastcast.render s.w s.h s.screen_view_dest s.eye s.spheres s.lights
 
-  let text (render_duration: f32) (s: state): []printf_input =
-    let top = (spad "(Press h to hide/show stats)",
-               [ printf_placeholder
-               , printf_placeholder
-               , printf_placeholder
-               ], argb.white)
-    in if !s.show_stats
-       then [top]
-       else [ top
-            , (spad "Futhark render: %s ms",
-               [ (#f32, printf_val with f32 = render_duration)
-               , printf_placeholder
-               , printf_placeholder
-               ], argb.white)
-            , (spad "Spheres: %s; lights: %s",
-               [ (#i32, printf_val with i32 = length s.spheres)
-               , (#i32, printf_val with i32 = length s.lights)
-               , printf_placeholder
-               ], argb.white)
-            , (spad "Position: (%s, %s, %s)",
-               [ (#f32, printf_val with f32 = s.eye.position.x)
-               , (#f32, printf_val with f32 = s.eye.position.y)
-               , (#f32, printf_val with f32 = s.eye.position.z)
-               ], argb.white)
-            , (spad "Orientation: (%s, %s, %s)",
-               [ (#f32, printf_val with f32 = s.eye.orientation.x)
-               , (#f32, printf_val with f32 = s.eye.orientation.y)
-               , (#f32, printf_val with f32 = s.eye.orientation.z)
-               ], argb.white)
-            , (spad "View dist.: %s",
-               [ (#f32, printf_val with f32 = s.screen_view_dest)
-               , printf_placeholder
-               , printf_placeholder
-               ], argb.white)
-            ]
+  let text_format = "Futhark render: %.2f ms\nSpheres: %d; lights: %d\nPosition: (%.2f, %.2f, %.2f)\nOrientation: (%.2f, %.2f, %.2f)\nView dist.: %.2f"
+
+  type text_content = (f32, i32, i32, f32, f32, f32, f32, f32, f32, f32)
+  let text_content (render_duration: f32) (s: state): text_content =
+    (render_duration,
+     length s.spheres, length s.lights,
+     s.eye.position.x, s.eye.position.y, s.eye.position.z,
+     s.eye.orientation.x, s.eye.orientation.y, s.eye.orientation.z,
+     s.screen_view_dest)
+
+  let text_colour = const argb.white
 
   let mouse _ _ _ s = s
   let wheel _ _ s = s

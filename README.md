@@ -22,7 +22,7 @@ Run `futhark pkg sync && make run` to run the default demo.
 + PageUp/PageDown: Move upwards/downwards
 + Shift: Move four times faster
 + Minus/Plus: Adjust the view distance to the virtual screen
-+ h: Toggle stats showing
++ F1: Toggle stats showing
 
 
 ## Requirements

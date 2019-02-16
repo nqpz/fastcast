@@ -5,3 +5,4 @@ __pycache__
 /lys
 /lys_wrapper.c
 /lys_wrapper.h
+/lys_printf.h
