@@ -24,11 +24,13 @@ let test_lights: []fastcast.light =
 type keys_state = {shift: bool, down: bool, up: bool, left: bool, right: bool,
                    pagedown: bool, pageup: bool, minus: bool, plus: bool}
 
-module lys: lys = {
+type text_content = (f32, i32, i32, f32, f32, f32, f32, f32, f32, f32)
+module lys: lys with text_content = text_content = {
   type state = {h: i32, w: i32,
                 screen_view_dest: f32, eye: fastcast.eye,
                 spheres: []fastcast.sphere, lights: []fastcast.light,
                 keys: keys_state, show_stats: bool}
+  type text_content = text_content
 
   let init (h: i32) (w: i32): state =
     {w, h,
@@ -126,7 +128,6 @@ module lys: lys = {
 
   let text_format = "Futhark render: %.2f ms\nSpheres: %d; lights: %d\nPosition: (%.2f, %.2f, %.2f)\nOrientation: (%.2f, %.2f, %.2f)\nView dist.: %.2f"
 
-  type text_content = (f32, i32, i32, f32, f32, f32, f32, f32, f32, f32)
   let text_content (render_duration: f32) (s: state): text_content =
     (render_duration,
      length s.spheres, length s.lights,
