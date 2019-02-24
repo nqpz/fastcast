@@ -2,7 +2,7 @@ __pycache__
 *.pyc
 *.o
 /lib
-/lys
-/lys_wrapper.c
-/lys_wrapper.h
-/lys_printf.h
+/demo
+/demo_wrapper.c
+/demo_wrapper.h
+/demo_printf.h

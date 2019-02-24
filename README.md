@@ -12,7 +12,12 @@ fastcast tries to keep it simple, and is compiled into a single map
 kernel over the screen dimensions.  There is also some bit fiddling just
 for the fun of it.
 
-Run `futhark pkg sync && make run` to run the default demo.
+
+## Building and running
+
+First run `futhark pkg sync` once.
+
+Then run `make` to build and `./demo` to run the default demo.
 
 
 ## Controls

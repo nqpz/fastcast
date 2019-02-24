@@ -53,7 +53,7 @@ let rotate_point (angle: angle) (origo: position) (point: position): position =
 -- Find intersections.  A sphere and a line has at most two intersections.  Note
 -- that one or both of the returned positions have NaN values if there are not
 -- two intersections.
-let ray_sphere_intersections (ray: line) (sphere: sphere): (position, position) =
+local let ray_sphere_intersections (ray: line) (sphere: sphere): (position, position) =
   let diff = ray.origin vec3.- sphere.center
   let core = vec3.dot ray.direction diff
   let det = core ** 2.0 - (vec3.norm diff) ** 2.0 + sphere.radius ** 2.0
@@ -67,7 +67,7 @@ let ray_sphere_intersections (ray: line) (sphere: sphere): (position, position) 
 -- the sphere with the smallest distance to the eye.  'dot' is either -1 or +1,
 -- and we use it to determine if the object is in front of us (good) or behind
 -- us (ignore).  'dist' can be NaN, which we also handle.
-let encode_dist_and_index (dist: f32) (dot: f32) (i: i32): i64 =
+local let encode_dist_and_index (dist: f32) (dot: f32) (i: i32): i64 =
   let k0 = i32.f32 (dot / 2.0 + 1.0)
   let k1 = i32.f32 (f32.abs dist + 1.5)
   let k1 = k1 // k1
@@ -75,11 +75,11 @@ let encode_dist_and_index (dist: f32) (dot: f32) (i: i32): i64 =
   (i64.i32 (k * i32.f32 dist + (1 - k) * i32.highest) << 32) | i64.i32 (k * i)
 
 -- Extract the index, which is stored on the 32 least significant bits.
-let decode_index (code: i64): i32 =
+local let decode_index (code: i64): i32 =
   i32.i64 code
 
 -- Create rays for casting.
-let make_ray (screen_view_dist: f32) (eye: eye) (origin: position): line =
+local let make_ray (screen_view_dist: f32) (eye: eye) (origin: position): line =
   let origin_origo = {x=0, y=0, z= -screen_view_dist}
   let origin' = rotate_point eye.orientation origin_origo origin
 
@@ -93,7 +93,7 @@ let make_ray (screen_view_dist: f32) (eye: eye) (origin: position): line =
   let origin'' = origin' vec3.+ eye.position
   in {origin=origin'', direction=direction''}
 
-let make_rays (width: i32) (height: i32) (screen_view_dist: f32) (eye: eye): [][]line =
+local let make_rays (width: i32) (height: i32) (screen_view_dist: f32) (eye: eye): [][]line =
   let make_ray_from_screen ((x, y): (i32, i32)): line =
     let origin = {x=r32 x - r32 width / 2.0,
                   y=r32 y - r32 height / 2.0,
@@ -105,7 +105,7 @@ let make_rays (width: i32) (height: i32) (screen_view_dist: f32) (eye: eye): [][
 -- Find the closest intersection between the ray and a sphere, and return both
 -- the hit position and the sphere.  If there is no hit, the position will be
 -- all NaN values, and the sphere will be a dummy sphere with radius 0.
-let find_intersection_hit [n_spheres]
+local let find_intersection_hit [n_spheres]
  (screen_view_dist: f32)
  (eye: eye)
  (ray: line)
@@ -138,14 +138,12 @@ let find_intersection_hit [n_spheres]
   let p = (vec3.scale (1.0 - k) p0) vec3.+ (vec3.scale k p1)
   in (p, s)
 
-let clamp_rgb (part: i32): i32 = i32.max 0 (i32.min 255 part)
-let clamp_f32 (color: f32): f32 = f32.max 0.0 (f32.min 1.0 color)
+local let clamp_rgb (part: i32): i32 = i32.max 0 (i32.min 255 part)
+local let clamp_f32 (color: f32): f32 = f32.max 0.0 (f32.min 1.0 color)
 
-let render
- (width: i32) (height: i32)
- (screen_view_dist: f32) (eye: eye)
- (spheres: []sphere) (lights: []light)
- : [][]argb =
+let render (width: i32) (height: i32)
+           (screen_view_dist: f32) (eye: eye)
+           (spheres: []sphere) (lights: []light): [][]argb =
   let rays = make_rays width height screen_view_dist eye
   let find_color (ray: line): argb =
     let (hit, sphere) = find_intersection_hit screen_view_dist eye ray spheres
@@ -171,9 +169,3 @@ let render
        | convert sphere.color.g light_color.g << 8
        | convert sphere.color.b light_color.b
   in map (map find_color) rays
-
-let zip6 [n] 'a 'b 'c 'd 'e 'f (as: [n]a) (bs: [n]b) (cs: [n]c) (ds: [n]d) (es: [n]e) (fs: [n]f): [n](a,b,c,d,e,f) =
-  map (\(a,(b,c,d,e,f)) -> (a,b,c,d,e,f)) (zip as (zip5 bs cs ds es fs))
-
-let zip7 [n] 'a 'b 'c 'd 'e 'f 'g (as: [n]a) (bs: [n]b) (cs: [n]c) (ds: [n]d) (es: [n]e) (fs: [n]f) (gs: [n]g): [n](a,b,c,d,e,f,g) =
-  map (\(a,(b,c,d,e,f,g)) -> (a,b,c,d,e,f,g)) (zip as (zip6 bs cs ds es fs gs))

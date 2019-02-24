@@ -1,9 +1,9 @@
 import "lib/github.com/diku-dk/lys/lys"
 
-module fastcast = import "fastcast"
+import "fastcast"
 
-let test_spheres: []fastcast.sphere =
-  [ {center={x=0, y=0, z=0}, radius=0, color={r=0, g=0, b=0}} -- dummy sphere
+let test_spheres: []sphere =
+  [ {center={x=0, y=0, z=0}, radius=0, color={r=0, g=0, b=0}} -- necessary dummy sphere
   , {center={x=100, y=100, z=240}, radius=120, color={r=0.9, g=0.1, b=0.8}}
   , {center={x=150, y=200, z=260}, radius=100, color={r=1.0, g=0.0, b=0.0}}
   , {center={x= -150, y= -200, z=160}, radius=100, color={r=0.1, g=0.2, b=0.9}}
@@ -12,7 +12,7 @@ let test_spheres: []fastcast.sphere =
                    radius=20.0 * f32.sqrt (f32.abs (f32.tan i)),
                    color={r=f32.abs (f32.tan i), g=0.8, b=f32.abs (f32.cos i)}}) (map r32 (0..<50))
 
-let test_lights: []fastcast.light =
+let test_lights: []light =
   [ {position={x=300, y=200, z=50}, intensity=80000,
      color={r=0.5, g=0.5, b=0.5}} -- medium grey light
   , {position={x= -400, y= -100, z=150}, intensity=30000,
@@ -27,8 +27,8 @@ type keys_state = {shift: bool, down: bool, up: bool, left: bool, right: bool,
 type text_content = (f32, i32, i32, f32, f32, f32, f32, f32, f32, f32)
 module lys: lys with text_content = text_content = {
   type state = {h: i32, w: i32,
-                screen_view_dest: f32, eye: fastcast.eye,
-                spheres: []fastcast.sphere, lights: []fastcast.light,
+                screen_view_dest: f32, eye: eye,
+                spheres: []sphere, lights: []light,
                 keys: keys_state, show_stats: bool}
   type text_content = text_content
 
@@ -76,15 +76,15 @@ module lys: lys with text_content = text_content = {
        then s with show_stats = !s.show_stats
        else s with keys = keychange k pressed s.keys
 
-  let step_eye (move_factor: f32) (keys: keys_state) (eye0: fastcast.eye) =
-    let move_eye op (eye : fastcast.eye) =
+  let step_eye (move_factor: f32) (keys: keys_state) (eye0: eye) =
+    let move_eye op (eye : eye) =
       let point = eye.position with z = op eye.position.z (5 * move_factor)
-      in eye with position = fastcast.rotate_point eye.orientation eye.position point
+      in eye with position = rotate_point eye.orientation eye.position point
 
-    let turn_eye op (eye : fastcast.eye) =
+    let turn_eye op (eye : eye) =
       eye with orientation.y = op eye.orientation.y (0.01 * move_factor)
 
-    let elevate_eye op (eye : fastcast.eye) =
+    let elevate_eye op (eye : eye) =
       eye with position.y = op eye.position.y (5 * move_factor)
 
     let eye1 = if keys.down
@@ -124,7 +124,7 @@ module lys: lys with text_content = text_content = {
         with lights = lights'
 
   let render (s: state) =
-    fastcast.render s.w s.h s.screen_view_dest s.eye s.spheres s.lights
+    render s.w s.h s.screen_view_dest s.eye s.spheres s.lights
 
   let text_format = "Futhark render: %.2f ms\nSpheres: %d; lights: %d\nPosition: (%.2f, %.2f, %.2f)\nOrientation: (%.2f, %.2f, %.2f)\nView dist.: %.2f"
 
