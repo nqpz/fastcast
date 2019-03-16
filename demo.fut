@@ -139,4 +139,5 @@ module lys: lys with text_content = text_content = {
 
   let mouse _ _ _ s = s
   let wheel _ _ s = s
+  let mouse_grab = false
 }
