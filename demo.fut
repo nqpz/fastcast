@@ -29,7 +29,7 @@ module lys: lys with text_content = text_content = {
   type state = {h: i32, w: i32,
                 screen_view_dest: f32, eye: eye,
                 spheres: []sphere, lights: []light,
-                keys: keys_state, show_stats: bool}
+                keys: keys_state}
   type text_content = text_content
 
   let init (h: i32) (w: i32): state =
@@ -39,8 +39,7 @@ module lys: lys with text_content = text_content = {
      spheres=copy test_spheres,
      lights=copy test_lights,
      keys={shift=false, down=false, up=false, left=false, right=false,
-           pagedown=false, pageup=false, minus=false, plus=false},
-     show_stats=true}
+           pagedown=false, pageup=false, minus=false, plus=false}}
 
   let resize (h: i32) (w: i32) (s: state) =
     s with h = h with w = w
@@ -72,9 +71,7 @@ module lys: lys with text_content = text_content = {
     let pressed = match e
                   case #keydown -> true
                   case #keyup -> false
-    in if k == SDLK_h && pressed
-       then s with show_stats = !s.show_stats
-       else s with keys = keychange k pressed s.keys
+    in s with keys = keychange k pressed s.keys
 
   let step_eye (move_factor: f32) (keys: keys_state) (eye0: eye) =
     let move_eye op (eye : eye) =
