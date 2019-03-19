@@ -126,10 +126,10 @@ module lys: lys with text_content = text_content = {
   let render (s: state) =
     render s.w s.h s.screen_view_dest s.eye s.spheres s.lights
 
-  let text_format = "Futhark render: %.2f ms\nSpheres: %d; lights: %d\nPosition: (%.2f, %.2f, %.2f)\nOrientation: (%.2f, %.2f, %.2f)\nView dist.: %.2f"
+  let text_format = "FPS: %.2f ms\nSpheres: %d; lights: %d\nPosition: (%.2f, %.2f, %.2f)\nOrientation: (%.2f, %.2f, %.2f)\nView dist.: %.2f"
 
-  let text_content (render_duration: f32) (s: state): text_content =
-    (render_duration,
+  let text_content (fps: f32) (s: state): text_content =
+    (fps,
      length s.spheres, length s.lights,
      s.eye.position.x, s.eye.position.y, s.eye.position.z,
      s.eye.orientation.x, s.eye.orientation.y, s.eye.orientation.z,
@@ -139,5 +139,5 @@ module lys: lys with text_content = text_content = {
 
   let mouse _ _ _ s = s
   let wheel _ _ s = s
-  let mouse_grab = false
+  let grab_mouse = false
 }
