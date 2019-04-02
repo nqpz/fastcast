@@ -32,7 +32,7 @@ module lys: lys with text_content = text_content = {
                 keys: keys_state}
   type text_content = text_content
 
-  let init (h: i32) (w: i32): state =
+  let init _ (h: i32) (w: i32): state =
     {w, h,
      screen_view_dest=800, eye={position={x=0, y=0, z=0},
                                 orientation={x=0, y=0, z=0}},
