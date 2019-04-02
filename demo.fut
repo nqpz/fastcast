@@ -24,7 +24,7 @@ let test_lights: []light =
 type keys_state = {shift: bool, down: bool, up: bool, left: bool, right: bool,
                    pagedown: bool, pageup: bool, minus: bool, plus: bool}
 
-type text_content = (f32, i32, i32, f32, f32, f32, f32, f32, f32, f32)
+type text_content = (i32, i32, i32, f32, f32, f32, f32, f32, f32, f32)
 module lys: lys with text_content = text_content = {
   type state = {h: i32, w: i32,
                 screen_view_dest: f32, eye: eye,
@@ -123,10 +123,10 @@ module lys: lys with text_content = text_content = {
   let render (s: state) =
     render s.w s.h s.screen_view_dest s.eye s.spheres s.lights
 
-  let text_format = "FPS: %.2f ms\nSpheres: %d; lights: %d\nPosition: (%.2f, %.2f, %.2f)\nOrientation: (%.2f, %.2f, %.2f)\nView dist.: %.2f"
+  let text_format = "FPS: %d\nSpheres: %d; lights: %d\nPosition: (%.2f, %.2f, %.2f)\nOrientation: (%.2f, %.2f, %.2f)\nView dist.: %.2f"
 
   let text_content (fps: f32) (s: state): text_content =
-    (fps,
+    (t32 fps,
      length s.spheres, length s.lights,
      s.eye.position.x, s.eye.position.y, s.eye.position.z,
      s.eye.orientation.x, s.eye.orientation.y, s.eye.orientation.z,
