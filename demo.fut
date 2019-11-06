@@ -67,12 +67,6 @@ module lys: lys with text_content = text_content = {
     then keys with plus = pressed
     else keys
 
-  let key (e: key_event) k (s: state) =
-    let pressed = match e
-                  case #keydown -> true
-                  case #keyup -> false
-    in s with keys = keychange k pressed s.keys
-
   let step_eye (move_factor: f32) (keys: keys_state) (eye0: eye) =
     let move_eye op (eye : eye) =
       let point = eye.position with z = op eye.position.z (5 * move_factor)
@@ -120,6 +114,14 @@ module lys: lys with text_content = text_content = {
         with spheres = spheres'
         with lights = lights'
 
+  let event (e: event) (s: state) =
+    match e
+    case #step td -> step td s
+    case #wheel _ -> s
+    case #mouse _ -> s
+    case #keydown {key} ->  s with keys = keychange key true s.keys
+    case #keyup {key} -> s with keys = keychange key false s.keys
+
   let render (s: state) =
     render s.w s.h s.screen_view_dest s.eye s.spheres s.lights
 
@@ -134,7 +136,5 @@ module lys: lys with text_content = text_content = {
 
   let text_colour = const argb.white
 
-  let mouse _ _ _ s = s
-  let wheel _ _ s = s
   let grab_mouse = false
 }
