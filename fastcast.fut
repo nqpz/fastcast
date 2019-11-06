@@ -52,7 +52,7 @@ let rotate_point (angle: angle) (origo: position) (point: position): position =
 
 -- Find intersections.  A sphere and a line has at most two intersections.  Note
 -- that one or both of the returned positions have NaN values if there are not
--- two intersections.
+-- two intersections.  This might result in weird rendering issues on some GPUs.
 local let ray_sphere_intersections (ray: line) (sphere: sphere): (position, position) =
   let diff = ray.origin vec3.- sphere.center
   let core = vec3.dot ray.direction diff
