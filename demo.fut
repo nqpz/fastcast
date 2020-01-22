@@ -125,7 +125,7 @@ module lys: lys with text_content = text_content = {
   let render (s: state) =
     render s.w s.h s.screen_view_dest s.eye s.spheres s.lights
 
-  let text_format = "FPS: %d\nSpheres: %d; lights: %d\nPosition: (%.2f, %.2f, %.2f)\nOrientation: (%.2f, %.2f, %.2f)\nView dist.: %.2f"
+  let text_format () = "FPS: %d\nSpheres: %d; lights: %d\nPosition: (%.2f, %.2f, %.2f)\nOrientation: (%.2f, %.2f, %.2f)\nView dist.: %.2f"
 
   let text_content (fps: f32) (s: state): text_content =
     (t32 fps,
