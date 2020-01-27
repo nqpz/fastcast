@@ -26,7 +26,7 @@ type keys_state = {shift: bool, down: bool, up: bool, left: bool, right: bool,
 
 type text_content = (i32, i32, i32, f32, f32, f32, f32, f32, f32, f32)
 module lys: lys with text_content = text_content = {
-  type state = {h: i32, w: i32,
+  type~ state = {h: i32, w: i32,
                 screen_view_dest: f32, eye: eye,
                 spheres: []sphere, lights: []light,
                 keys: keys_state}
