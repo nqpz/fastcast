@@ -70,7 +70,7 @@ local let ray_sphere_intersections (ray: line) (sphere: sphere): (position, posi
 local let encode_dist_and_index (dist: f32) (dot: f32) (i: i32): i64 =
   let k0 = i32.f32 (dot / 2.0 + 1.0)
   let k1 = i32.f32 (f32.abs dist + 1.5)
-  let k1 = k1 // k1
+  let k1 = if k1 == 0 then 0 else k1 // k1
   let k = k0 * k1 in
   (i64.i32 (k * i32.f32 dist + (1 - k) * i32.highest) << 32) | i64.i32 (k * i)
 
