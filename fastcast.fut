@@ -132,7 +132,7 @@ local let find_intersection_hit [n_spheres]
                         (map2 prep (0..<n_spheres) spheres)
 
   let i0 = decode_index res
-  let s = unsafe spheres[i0 // 2]
+  let s = spheres[i0 // 2]
   let (p0, p1) = ray_sphere_intersections ray s
   let k = f32.i32 (i0 & 1)
   let p = (vec3.scale (1.0 - k) p0) vec3.+ (vec3.scale k p1)
