@@ -9,7 +9,7 @@ type direction = vec3.vector
 type angle = vec3.vector
 
 type rgb = {r: f32, g: f32, b: f32}
-type argb = i32
+type argb = u32
 
 type sphere = {center: position,
                radius: f32,
@@ -138,7 +138,7 @@ local let find_intersection_hit [n_spheres]
   let p = (vec3.scale (1.0 - k) p0) vec3.+ (vec3.scale k p1)
   in (p, s)
 
-local let clamp_rgb (part: i32): i32 = i32.max 0 (i32.min 255 part)
+local let clamp_rgb (part: i32): u32 = u32.i32 (i32.max 0 (i32.min 255 part))
 local let clamp_f32 (color: f32): f32 = f32.max 0.0 (f32.min 1.0 color)
 
 let render (width: i32) (height: i32)
