@@ -24,15 +24,15 @@ let test_lights: []light =
 type keys_state = {shift: bool, down: bool, up: bool, left: bool, right: bool,
                    pagedown: bool, pageup: bool, minus: bool, plus: bool}
 
-type text_content = (i32, i32, i32, f32, f32, f32, f32, f32, f32, f32)
+type text_content = (i32, i64, i64, f32, f32, f32, f32, f32, f32, f32)
 module lys: lys with text_content = text_content = {
-  type~ state = {h: i32, w: i32,
+  type~ state = {h: i64, w: i64,
                  screen_view_dest: f32, eye: eye,
                  spheres: []sphere, lights: []light,
                  keys: keys_state}
   type text_content = text_content
 
-  let init _ (h: i32) (w: i32): state =
+  let init _ (h: i64) (w: i64): state =
     {w, h,
      screen_view_dest=800, eye={position={x=0, y=0, z=0},
                                 orientation={x=0, y=0, z=0}},
@@ -41,7 +41,7 @@ module lys: lys with text_content = text_content = {
      keys={shift=false, down=false, up=false, left=false, right=false,
            pagedown=false, pageup=false, minus=false, plus=false}}
 
-  let resize (h: i32) (w: i32) (s: state) =
+  let resize (h: i64) (w: i64) (s: state) =
     s with h = h with w = w
 
   let keychange k pressed (keys: keys_state): keys_state =
@@ -123,9 +123,9 @@ module lys: lys with text_content = text_content = {
     case #keyup {key} -> s with keys = keychange key false s.keys
 
   let render (s: state) =
-    render s.w s.h s.screen_view_dest s.eye s.spheres s.lights
+    render (i32.i64 s.w) (i32.i64 s.h) s.screen_view_dest s.eye s.spheres s.lights
 
-  let text_format () = "FPS: %d\nSpheres: %d; lights: %d\nPosition: (%.2f, %.2f, %.2f)\nOrientation: (%.2f, %.2f, %.2f)\nView dist.: %.2f"
+  let text_format () = "FPS: %d\nSpheres: %ld; lights: %ld\nPosition: (%.2f, %.2f, %.2f)\nOrientation: (%.2f, %.2f, %.2f)\nView dist.: %.2f"
 
   let text_content (fps: f32) (s: state): text_content =
     (t32 fps,

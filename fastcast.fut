@@ -100,7 +100,7 @@ local let make_rays (width: i32) (height: i32) (screen_view_dist: f32) (eye: eye
                   z=0}
     in make_ray screen_view_dist eye origin
   in map (map make_ray_from_screen)
-         (tabulate_2d height width (\y x -> (x, y)))
+         (tabulate_2d (i64.i32 height) (i64.i32 width) (\y x -> (i32.i64 x, i32.i64 y)))
 
 -- Find the closest intersection between the ray and a sphere, and return both
 -- the hit position and the sphere.  If there is no hit, the position will be
@@ -110,7 +110,7 @@ local let find_intersection_hit [n_spheres]
  (eye: eye)
  (ray: line)
  (spheres: [n_spheres]sphere): (position, sphere) =
-  let prep (i: i32) (sphere: sphere): i64 =
+  let prep (i: i64) (sphere: sphere): i64 =
     let (p0, p1) = ray_sphere_intersections ray sphere
     let middle_ray = make_ray screen_view_dist eye {x=0, y=0, z=0}
     let backwards_bonus =
@@ -121,8 +121,8 @@ local let find_intersection_hit [n_spheres]
     let dot1 = vec3.dot ray.direction (vec3.normalise (p1 vec3.- backwards_bonus))
     let (dist0, dist1) = (vec3.norm (p0 vec3.- backwards_bonus),
                           vec3.norm (p1 vec3.- backwards_bonus))
-    let (i0, i1) = (i * 2,
-                    i * 2 + 1)
+    let (i0, i1) = (i32.i64 i * 2,
+                    i32.i64 i * 2 + 1)
 
     in i64.min (encode_dist_and_index dist0 dot0 i0)
                (encode_dist_and_index dist1 dot1 i1)
