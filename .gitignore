@@ -5,4 +5,5 @@ __pycache__
 /demo
 /demo_wrapper.c
 /demo_wrapper.h
+/demo_wrapper.json
 /demo_printf.h
